@@ -1,6 +1,29 @@
 # Reader
 A win32 txt/epub/online file reader  
 
+## macOS 快速可用版
+
+这个仓库原始桌面实现是 **纯 Win32**，不能直接导出原生 mac 包。  
+为了最快让 mac 能用起来，仓库里新增了两个方向：
+
+- 优先双击 `mac-web/Open Reader.command`
+- 或者直接打开 `mac-web/index.html`
+- 当前支持本地 `txt / epub`
+- 支持目录、字号、行高、主题、进度保存
+
+详情见：[mac-web/README.md](mac-web/README.md)
+
+## macOS 原生版
+
+仓库里还新增了一个真正原生的 `mac-native/` 工程：
+
+- 技术栈：`SwiftUI + WebKit`
+- 当前支持本地 `txt / epub`
+- 可在 mac 上导出 `.app`
+- 也可以通过 GitHub Actions 直接导出 mac 构建产物
+
+详情见：[mac-native/README.md](mac-native/README.md)
+
 最新release版本：　`v2.0.0.4`
 版本描述  | 下载地址
 ------------- | -------------

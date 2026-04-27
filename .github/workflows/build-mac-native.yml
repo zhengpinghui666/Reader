@@ -1,0 +1,29 @@
+name: Build Native macOS App
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "mac-native/**"
+      - ".github/workflows/build-mac-native.yml"
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build native macOS app bundle
+        working-directory: mac-native
+        run: |
+          chmod +x build-mac.sh
+          ./build-mac.sh
+
+      - name: Upload app artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ReaderMacNative-macOS
+          path: mac-native/dist/ReaderMacNative-macOS.zip
+          if-no-files-found: error

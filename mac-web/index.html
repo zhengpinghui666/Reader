@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reader for macOS</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar__title">
+        <h1>Reader for macOS</h1>
+        <p>为原 Win32 Reader 补的跨平台离线阅读版本</p>
+      </div>
+      <div class="topbar__actions">
+        <label class="file-trigger">
+          <input id="file-input" type="file" accept=".txt,.epub,.md,.text">
+          <span>打开文件</span>
+        </label>
+        <select id="encoding-select" title="TXT 编码">
+          <option value="auto">TXT 自动编码</option>
+          <option value="utf-8">UTF-8</option>
+          <option value="gb18030">GB18030 / GBK</option>
+          <option value="utf-16le">UTF-16 LE</option>
+          <option value="utf-16be">UTF-16 BE</option>
+        </select>
+        <select id="theme-select" title="主题">
+          <option value="paper">纸张</option>
+          <option value="night">夜间</option>
+          <option value="forest">松针</option>
+          <option value="sepia">暖黄</option>
+        </select>
+        <label class="slider-field" title="字体大小">
+          <span>字号</span>
+          <input id="font-size-range" type="range" min="14" max="36" step="1">
+          <strong id="font-size-value"></strong>
+        </label>
+        <label class="slider-field" title="行高">
+          <span>行高</span>
+          <input id="line-height-range" type="range" min="1.2" max="2.4" step="0.1">
+          <strong id="line-height-value"></strong>
+        </label>
+        <button id="reset-settings-btn" class="ghost-btn" type="button">恢复默认</button>
+      </div>
+    </header>
+
+    <div class="content-layout">
+      <aside class="sidebar">
+        <section class="sidebar-card">
+          <h2>当前文件</h2>
+          <div id="file-meta" class="file-meta">还没有打开文件</div>
+          <div id="status-line" class="status-line">支持本地 TXT / EPUB。MOBI 与在线书源暂未迁移。</div>
+        </section>
+
+        <section class="sidebar-card sidebar-card--grow">
+          <div class="sidebar-card__head">
+            <h2>目录</h2>
+            <span id="toc-count" class="toc-count">0</span>
+          </div>
+          <div id="toc-list" class="toc-list"></div>
+        </section>
+      </aside>
+
+      <main id="drop-zone" class="reader-stage">
+        <section id="empty-state" class="empty-state">
+          <div class="empty-state__box">
+            <h2>把 Reader 带到 mac 的最快方案</h2>
+            <p>这个仓库原本是纯 Win32 桌面应用，无法直接导出原生 mac 可执行包。</p>
+            <p>我先做了一个可直接在 mac 浏览器中使用的离线阅读版：双击这个目录里的 <code>index.html</code> 就能打开。</p>
+            <p>把 TXT / EPUB 文件拖进来，或者点上面的“打开文件”。</p>
+          </div>
+        </section>
+
+        <section id="txt-view" class="reader-view hidden">
+          <div class="reader-toolbar">
+            <div class="toolbar-group">
+              <button id="txt-prev-btn" type="button">上一章</button>
+              <button id="txt-next-btn" type="button">下一章</button>
+            </div>
+            <div id="txt-progress" class="toolbar-status">未打开 TXT</div>
+          </div>
+          <div id="txt-scroll" class="reader-scroll">
+            <article id="txt-content" class="txt-content"></article>
+          </div>
+        </section>
+
+        <section id="epub-view" class="reader-view hidden">
+          <div class="reader-toolbar">
+            <div class="toolbar-group">
+              <button id="epub-prev-btn" type="button">上一页</button>
+              <button id="epub-next-btn" type="button">下一页</button>
+            </div>
+            <div id="epub-progress" class="toolbar-status">未打开 EPUB</div>
+          </div>
+          <div id="epub-container" class="epub-container"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="./vendor/epub.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
