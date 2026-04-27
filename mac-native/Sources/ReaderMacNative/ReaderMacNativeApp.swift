@@ -242,7 +242,7 @@ struct TextReaderView: View {
 
                         ForEach(paragraphItems.indices, id: \.self) { index in
                             let paragraph = paragraphItems[index]
-                            if paragraph.isEmpty {
+                            if paragraph.text.isEmpty {
                                 Color.clear.frame(height: 10)
                             } else if paragraph.isHeading {
                                 Text(paragraph.text)

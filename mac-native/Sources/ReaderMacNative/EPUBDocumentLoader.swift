@@ -336,6 +336,6 @@ enum EPUBDocumentLoader {
         forXPath xpath: String,
         in node: XMLNode
     ) throws -> XMLNode? {
-        try node.nodes(forXPath: xpath).first as? XMLNode
+        try node.nodes(forXPath: xpath).first
     }
 }
