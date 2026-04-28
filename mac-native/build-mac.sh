@@ -51,7 +51,7 @@ cat > "$APP_DIR/Contents/Info.plist" <<'PLIST'
   <key>CFBundleVersion</key>
   <string>1</string>
   <key>LSMinimumSystemVersion</key>
-  <string>12.0</string>
+  <string>13.0</string>
   <key>NSPrincipalClass</key>
   <string>NSApplication</string>
   <key>NSHighResolutionCapable</key>
@@ -76,12 +76,16 @@ if command -v hdiutil >/dev/null 2>&1; then
   ln -s /Applications "$DMG_STAGING_DIR/Applications"
 
   rm -f "$DMG_PATH"
-  hdiutil create \
+  if hdiutil create \
     -volname "$APP_NAME" \
     -srcfolder "$DMG_STAGING_DIR" \
     -ov \
     -format UDZO \
-    "$DMG_PATH"
+    "$DMG_PATH"; then
+    echo "DMG export completed."
+  else
+    echo "Warning: DMG export failed; zip export is still available."
+  fi
 
   rm -rf "$DMG_STAGING_DIR"
 else

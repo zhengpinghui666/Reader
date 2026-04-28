@@ -18,8 +18,9 @@ jobs:
       - name: Build native macOS app bundle
         working-directory: mac-native
         run: |
+          set -o pipefail
           chmod +x build-mac.sh
-          ./build-mac.sh
+          ./build-mac.sh 2>&1 | tee build.log
 
       - name: Upload app artifact
         uses: actions/upload-artifact@v4
@@ -29,3 +30,11 @@ jobs:
             mac-native/dist/ReaderMacNative-macOS.zip
             mac-native/dist/ReaderMacNative-macOS.dmg
           if-no-files-found: error
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ReaderMacNative-build-log
+          path: mac-native/build.log
+          if-no-files-found: ignore
