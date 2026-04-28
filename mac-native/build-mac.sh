@@ -5,16 +5,21 @@ ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DIST_DIR="$ROOT_DIR/dist"
 APP_NAME="ReaderMacNative"
 APP_DIR="$DIST_DIR/$APP_NAME.app"
-ZIP_PATH="$DIST_DIR/$APP_NAME-macOS.zip"
-TAR_PATH="$DIST_DIR/$APP_NAME-macOS.tar.gz"
-PKG_PATH="$DIST_DIR/$APP_NAME-macOS.pkg"
+DIST_LABEL="${READER_DIST_LABEL:-macOS}"
+ZIP_PATH="$DIST_DIR/$APP_NAME-$DIST_LABEL.zip"
+TAR_PATH="$DIST_DIR/$APP_NAME-$DIST_LABEL.tar.gz"
+PKG_PATH="$DIST_DIR/$APP_NAME-$DIST_LABEL.pkg"
 DMG_STAGING_DIR="$DIST_DIR/dmg-staging"
-DMG_PATH="$DIST_DIR/$APP_NAME-macOS.dmg"
+DMG_PATH="$DIST_DIR/$APP_NAME-$DIST_LABEL.dmg"
 
 cd "$ROOT_DIR"
 
 BUILD_ARGS=(-c release --product "$APP_NAME")
-UNIVERSAL_BUILD_ARGS=(-c release --product "$APP_NAME" --arch arm64 --arch x86_64)
+if [[ -n "${READER_ARCHES:-}" ]]; then
+  for arch in $READER_ARCHES; do
+    BUILD_ARGS+=(--arch "$arch")
+  done
+fi
 
 echo "macOS build host:"
 uname -a || true
@@ -22,17 +27,16 @@ if command -v xcodebuild >/dev/null 2>&1; then
   xcodebuild -version || true
 fi
 
-if [[ "$(uname -s)" == "Darwin" ]] && swift build "${UNIVERSAL_BUILD_ARGS[@]}"; then
-  echo "Universal Swift build completed."
-  EXECUTABLE_PATH="$ROOT_DIR/.build/apple/Products/Release/$APP_NAME"
-  if [[ ! -f "$EXECUTABLE_PATH" ]]; then
-    EXECUTABLE_PATH="$(find "$ROOT_DIR/.build" -type f -name "$APP_NAME" -perm -u+x | grep -E '/(Release|release)/' | head -n 1 || true)"
-  fi
-else
-  echo "Universal build unavailable; building for the current host architecture."
-  swift build "${BUILD_ARGS[@]}"
-  BIN_DIR="$(swift build -c release --show-bin-path)"
-  EXECUTABLE_PATH="$BIN_DIR/$APP_NAME"
+if [[ -n "${READER_ARCHES:-}" ]]; then
+  echo "Requested architecture(s): $READER_ARCHES"
+fi
+
+rm -rf "$ROOT_DIR/.build"
+swift build "${BUILD_ARGS[@]}"
+BIN_DIR="$(swift build "${BUILD_ARGS[@]}" --show-bin-path)"
+EXECUTABLE_PATH="$BIN_DIR/$APP_NAME"
+if [[ ! -f "$EXECUTABLE_PATH" ]]; then
+  EXECUTABLE_PATH="$(find "$ROOT_DIR/.build" -type f -name "$APP_NAME" | grep -E '/(Release|release)/' | head -n 1 || true)"
 fi
 
 if [[ ! -f "$EXECUTABLE_PATH" ]]; then
@@ -78,7 +82,7 @@ cat > "$APP_DIR/Contents/Info.plist" <<'PLIST'
   <key>CFBundleVersion</key>
   <string>1</string>
   <key>LSMinimumSystemVersion</key>
-  <string>12.0</string>
+  <string>13.0</string>
   <key>NSPrincipalClass</key>
   <string>NSApplication</string>
   <key>CFBundleSupportedPlatforms</key>

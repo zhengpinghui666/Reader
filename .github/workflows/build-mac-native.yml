@@ -9,7 +9,18 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    name: build-${{ matrix.artifact-suffix }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - artifact-suffix: apple-silicon
+            runner: macos-14
+            arch: arm64
+          - artifact-suffix: intel
+            runner: macos-15-intel
+            arch: x86_64
 
     steps:
       - name: Checkout repository
@@ -17,26 +28,29 @@ jobs:
 
       - name: Build native macOS app bundle
         working-directory: mac-native
+        env:
+          READER_ARCHES: ${{ matrix.arch }}
+          READER_DIST_LABEL: macOS-${{ matrix.artifact-suffix }}
         run: |
           set -o pipefail
           chmod +x build-mac.sh
-          ./build-mac.sh 2>&1 | tee build.log
+          ./build-mac.sh 2>&1 | tee build-${{ matrix.artifact-suffix }}.log
 
       - name: Upload app artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ReaderMacNative-macOS
+          name: ReaderMacNative-macOS-${{ matrix.artifact-suffix }}
           path: |
-            mac-native/dist/ReaderMacNative-macOS.zip
-            mac-native/dist/ReaderMacNative-macOS.dmg
-            mac-native/dist/ReaderMacNative-macOS.pkg
-            mac-native/dist/ReaderMacNative-macOS.tar.gz
+            mac-native/dist/ReaderMacNative-macOS-${{ matrix.artifact-suffix }}.zip
+            mac-native/dist/ReaderMacNative-macOS-${{ matrix.artifact-suffix }}.dmg
+            mac-native/dist/ReaderMacNative-macOS-${{ matrix.artifact-suffix }}.pkg
+            mac-native/dist/ReaderMacNative-macOS-${{ matrix.artifact-suffix }}.tar.gz
           if-no-files-found: error
 
       - name: Upload build log
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ReaderMacNative-build-log
-          path: mac-native/build.log
+          name: ReaderMacNative-build-log-${{ matrix.artifact-suffix }}
+          path: mac-native/build-${{ matrix.artifact-suffix }}.log
           if-no-files-found: ignore

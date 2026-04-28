@@ -11,7 +11,7 @@
 
 ## 当前支持
 
-- macOS 12 或更新版本
+- macOS 13 或更新版本
 - 本地 `txt`
 - 本地 `epub`
 - 章节 / 目录导航
@@ -67,7 +67,7 @@ mac-native/dist/ReaderMacNative-macOS.pkg
 mac-native/dist/ReaderMacNative-macOS.tar.gz
 ```
 
-推荐普通用户优先下载 `.dmg`，打开后把 `ReaderMacNative.app` 拖到 `Applications`。
+推荐普通用户优先下载匹配自己 Mac 芯片的 `.dmg`，打开后把 `ReaderMacNative.app` 拖到 `Applications`。
 
 方式三：用 Xcode 打开
 
@@ -82,8 +82,10 @@ mac-native/dist/ReaderMacNative-macOS.tar.gz
 1. 打开 `Actions`
 2. 运行 `Build Native macOS App`
 3. 在 Artifact 里下载 `ReaderMacNative-macOS`
-4. 优先使用里面的 `ReaderMacNative-macOS.dmg`
-5. 如果 `.dmg` 安装后仍打不开，再试 `ReaderMacNative-macOS.pkg`
+4. Apple Silicon / M 系列芯片下载 `ReaderMacNative-macOS-apple-silicon`
+5. Intel 芯片下载 `ReaderMacNative-macOS-intel`
+6. 优先使用里面的 `.dmg`
+7. 如果 `.dmg` 安装后仍打不开，再试 `.pkg`
 
 ## 打不开时
 

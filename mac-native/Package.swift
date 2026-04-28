@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "ReaderMacNative",
     platforms: [
-        .macOS(.v12),
+        .macOS(.v13),
     ],
     products: [
         .executable(
