@@ -6,6 +6,8 @@ DIST_DIR="$ROOT_DIR/dist"
 APP_NAME="ReaderMacNative"
 APP_DIR="$DIST_DIR/$APP_NAME.app"
 ZIP_PATH="$DIST_DIR/$APP_NAME-macOS.zip"
+DMG_STAGING_DIR="$DIST_DIR/dmg-staging"
+DMG_PATH="$DIST_DIR/$APP_NAME-macOS.dmg"
 
 cd "$ROOT_DIR"
 
@@ -49,7 +51,7 @@ cat > "$APP_DIR/Contents/Info.plist" <<'PLIST'
   <key>CFBundleVersion</key>
   <string>1</string>
   <key>LSMinimumSystemVersion</key>
-  <string>13.0</string>
+  <string>12.0</string>
   <key>NSPrincipalClass</key>
   <string>NSApplication</string>
   <key>NSHighResolutionCapable</key>
@@ -59,11 +61,32 @@ cat > "$APP_DIR/Contents/Info.plist" <<'PLIST'
 PLIST
 
 if command -v codesign >/dev/null 2>&1; then
-  codesign --force --deep --sign - "$APP_DIR" >/dev/null 2>&1 || true
+  codesign --force --deep --sign - "$APP_DIR" || echo "Warning: ad-hoc codesign failed; continuing unsigned."
 fi
+
+xattr -cr "$APP_DIR" >/dev/null 2>&1 || true
 
 rm -f "$ZIP_PATH"
 ditto -c -k --sequesterRsrc --keepParent "$APP_DIR" "$ZIP_PATH"
+
+if command -v hdiutil >/dev/null 2>&1; then
+  rm -rf "$DMG_STAGING_DIR"
+  mkdir -p "$DMG_STAGING_DIR"
+  cp -R "$APP_DIR" "$DMG_STAGING_DIR/"
+  ln -s /Applications "$DMG_STAGING_DIR/Applications"
+
+  rm -f "$DMG_PATH"
+  hdiutil create \
+    -volname "$APP_NAME" \
+    -srcfolder "$DMG_STAGING_DIR" \
+    -ov \
+    -format UDZO \
+    "$DMG_PATH"
+
+  rm -rf "$DMG_STAGING_DIR"
+else
+  echo "hdiutil not found; skipping DMG export."
+fi
 
 echo ""
 echo "ReaderMacNative.app exported to:"
@@ -71,3 +94,9 @@ echo "$APP_DIR"
 echo ""
 echo "ReaderMacNative zip exported to:"
 echo "$ZIP_PATH"
+
+if [[ -f "$DMG_PATH" ]]; then
+  echo ""
+  echo "ReaderMacNative dmg exported to:"
+  echo "$DMG_PATH"
+fi

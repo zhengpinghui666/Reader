@@ -20,6 +20,8 @@ A win32 txt/epub/online file reader
 - 技术栈：`SwiftUI + WebKit`
 - 当前支持本地 `txt / epub`
 - 可在 mac 上导出 `.app`
+- 在 mac 上可双击 `mac-native/Build and Install.command` 本地构建并安装
+- 同时导出更适合普通安装的 `.dmg`
 - 也可以通过 GitHub Actions 直接导出 mac 构建产物
 
 详情见：[mac-native/README.md](mac-native/README.md)
