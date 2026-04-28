@@ -29,6 +29,8 @@ jobs:
           path: |
             mac-native/dist/ReaderMacNative-macOS.zip
             mac-native/dist/ReaderMacNative-macOS.dmg
+            mac-native/dist/ReaderMacNative-macOS.pkg
+            mac-native/dist/ReaderMacNative-macOS.tar.gz
           if-no-files-found: error
 
       - name: Upload build log

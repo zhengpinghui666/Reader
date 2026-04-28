@@ -11,7 +11,7 @@
 
 ## 当前支持
 
-- macOS 13 或更新版本
+- macOS 12 或更新版本
 - 本地 `txt`
 - 本地 `epub`
 - 章节 / 目录导航
@@ -58,11 +58,13 @@ chmod +x build-mac.sh
 mac-native/dist/ReaderMacNative.app
 ```
 
-同时会额外生成方便分发的压缩包和 macOS 安装镜像：
+同时会额外生成方便分发的压缩包、macOS 安装镜像和安装包：
 
 ```bash
 mac-native/dist/ReaderMacNative-macOS.zip
 mac-native/dist/ReaderMacNative-macOS.dmg
+mac-native/dist/ReaderMacNative-macOS.pkg
+mac-native/dist/ReaderMacNative-macOS.tar.gz
 ```
 
 推荐普通用户优先下载 `.dmg`，打开后把 `ReaderMacNative.app` 拖到 `Applications`。
@@ -81,19 +83,21 @@ mac-native/dist/ReaderMacNative-macOS.dmg
 2. 运行 `Build Native macOS App`
 3. 在 Artifact 里下载 `ReaderMacNative-macOS`
 4. 优先使用里面的 `ReaderMacNative-macOS.dmg`
+5. 如果 `.dmg` 安装后仍打不开，再试 `ReaderMacNative-macOS.pkg`
 
 ## 打不开时
 
 如果 macOS 只提示 `The application "ReaderMacNative" can't be opened.`：
 
-1. 在 Mac 上重新运行 `mac-native/Build and Install.command`
-2. 或者优先使用 `.dmg` 安装，不要经过聊天软件解压 `.app`
-3. 右键点击 `ReaderMacNative.app`，选择 `Open`
+1. 打开 `.dmg` 后，把 `ReaderMacNative.app` 拖到 `Applications`
+2. 在 `.dmg` 窗口里双击 `Fix and Open Reader.command`
+3. 或者改用 `ReaderMacNative-macOS.pkg` 安装
 4. 如果仍然打不开，终端执行：
 
 ```bash
 xattr -cr /Applications/ReaderMacNative.app
 chmod +x /Applications/ReaderMacNative.app/Contents/MacOS/ReaderMacNative
+file /Applications/ReaderMacNative.app/Contents/MacOS/ReaderMacNative
 open /Applications/ReaderMacNative.app
 ```
 
