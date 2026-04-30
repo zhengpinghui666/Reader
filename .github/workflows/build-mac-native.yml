@@ -7,6 +7,9 @@ on:
       - "mac-native/**"
       - ".github/workflows/build-mac-native.yml"
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: build-${{ matrix.artifact-suffix }}
@@ -54,3 +57,28 @@ jobs:
           name: ReaderMacNative-build-log-${{ matrix.artifact-suffix }}
           path: mac-native/build-${{ matrix.artifact-suffix }}.log
           if-no-files-found: ignore
+
+  publish-release:
+    name: publish-release
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ReaderMacNative-macOS-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Publish latest macOS release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: reader-mac-native-latest
+        run: |
+          set -euo pipefail
+          find release-assets -maxdepth 1 -type f -print | sort
+          gh release delete "$TAG_NAME" --cleanup-tag --yes 2>/dev/null || true
+          gh release create "$TAG_NAME" release-assets/* \
+            --title "ReaderMacNative macOS latest" \
+            --notes "Automated macOS build from ${GITHUB_SHA}. Use apple-silicon for M-series Macs and intel for Intel Macs."
