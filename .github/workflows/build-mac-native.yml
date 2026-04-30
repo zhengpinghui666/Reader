@@ -64,6 +64,9 @@ jobs:
     needs: build
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download macOS artifacts
         uses: actions/download-artifact@v4
         with:
@@ -74,11 +77,28 @@ jobs:
       - name: Publish latest macOS release
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           TAG_NAME: reader-mac-native-latest
         run: |
           set -euo pipefail
-          find release-assets -maxdepth 1 -type f -print | sort
-          gh release delete "$TAG_NAME" --cleanup-tag --yes 2>/dev/null || true
-          gh release create "$TAG_NAME" release-assets/* \
+          exec > >(tee publish-release.log) 2>&1
+          mapfile -t assets < <(find release-assets -maxdepth 1 -type f -print | sort)
+          printf '%s\n' "${assets[@]}"
+          if [[ "${#assets[@]}" -eq 0 ]]; then
+            echo "No release assets were downloaded."
+            exit 1
+          fi
+          gh release delete "$TAG_NAME" --repo "$GH_REPO" --cleanup-tag --yes 2>/dev/null || true
+          gh release create "$TAG_NAME" "${assets[@]}" \
+            --repo "$GH_REPO" \
+            --target "$GITHUB_SHA" \
             --title "ReaderMacNative macOS latest" \
             --notes "Automated macOS build from ${GITHUB_SHA}. Use apple-silicon for M-series Macs and intel for Intel Macs."
+
+      - name: Upload publish log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ReaderMacNative-publish-release-log
+          path: publish-release.log
+          if-no-files-found: ignore
